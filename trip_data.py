@@ -29,6 +29,9 @@ def get_divvy_trips_2019_q2_q3():
     data['start_time'] = data['start_time'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
     data['end_time'] = data['end_time'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
 
+    # convert started_at to df.index
+    data.index = data['start_time']
+
     return data
 
 def get_divvy_trips_2020_q2_q3():
@@ -48,5 +51,8 @@ def get_divvy_trips_2020_q2_q3():
     # Fix datetime strings to dates
     data['started_at'] = data['started_at'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
     data['ended_at'] = data['ended_at'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
-    
+
+    # convert started_at to df.index
+    data.index = data['started_at']
+
     return data
