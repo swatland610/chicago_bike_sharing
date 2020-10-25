@@ -1,5 +1,6 @@
 # Data file
 divvy_data/
+cleaned_data/
 
 # Editors
 .vscode/

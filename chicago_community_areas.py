@@ -1,26 +1,21 @@
 import requests
 import pandas as pd 
-import geopandas as gpd 
-
-
-
+pd.set_option('display.max_rows',100)
 
 def pull_community_areas_data():
     # Grab 2017 community areas and population data
     url = "https://en.wikipedia.org/wiki/Community_areas_in_Chicago"
     html_tables = pd.read_html(url)
 
-    # Grab Community Areas GeoData to access community area locations of starting and end trips
-    url = "https://data.cityofchicago.org/resource/igwz-8jzy.json"
-    r = requests.get(url)
-    community_area_boundaries = pd.DataFrame(pd.read_json(r.text))
-
     # Establish DF of community areas with population
-    community_area_w_pop = pd.DataFrame(html_tables[0])
+    community_area_w_pop = pd.DataFrame(html_tables[0])[:-1]
+
     # DF of Community Area Groups
     community_area_groups = pd.DataFrame(html_tables[1])
 
-    return community_area_w_pop, community_area_groups, community_area_boundaries
+    # fix formatting of community area number
+    community_area_w_pop['Number[8]'] = community_area_w_pop['Number[8]'].apply(lambda x: int(x))
+    return community_area_w_pop, community_area_groups
 
 
 
