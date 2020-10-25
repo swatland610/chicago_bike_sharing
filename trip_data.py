@@ -1,7 +1,11 @@
-import pandas as pd 
+import pandas as pd
+import time 
 from datetime import datetime, date
 
 def get_divvy_trips_2019_q2_q3():
+    # set start time for time keeping
+    start_time = time.time()
+
     # Read in csv trip files
     trips_2019_q2 = pd.read_csv('divvy_data/Divvy_Trips_2019_Q2.csv')
     trips_2019_q3 = pd.read_csv('divvy_data/Divvy_Trips_2019_Q3.csv')
@@ -32,9 +36,15 @@ def get_divvy_trips_2019_q2_q3():
     # convert started_at to df.index
     data.index = data['start_time']
 
+    # print completed time
+    print(get_divvy_trips_2019_q2_q3.__name__, " completed in ", time.time() - start_time)
+    
     return data
 
 def get_divvy_trips_2020_q2_q3():
+    # start_time for time keeping
+    start_time = time.time()
+
     # Read in csv trip files
     trips_2020_04 = pd.read_csv('divvy_data/202004-divvy-tripdata.csv')
     trips_2020_05 = pd.read_csv('divvy_data/202005-divvy-tripdata.csv')
@@ -54,5 +64,8 @@ def get_divvy_trips_2020_q2_q3():
 
     # convert started_at to df.index
     data.index = data['started_at']
+
+    # print completed time
+    print(get_divvy_trips_2020_q2_q3.__name__, " completed in ", time.time() - start_time)
 
     return data

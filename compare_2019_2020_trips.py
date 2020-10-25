@@ -5,8 +5,12 @@ from divvy_stations import get_divvy_station_data
 
 # import modules
 import pandas as pd 
+import time
 
 def assemble_trips_data():
+    # start time for time keeping
+    start_time = time.time()
+
     # inititate data objects
     divvy_2019 = get_divvy_trips_2019_q2_q3()
     divvy_2020 = get_divvy_trips_2020_q2_q3()
@@ -33,17 +37,30 @@ def assemble_trips_data():
     divvy_2020[['to_community_area', 'to_community_name', 'to_chicago_area']] = divvy_2020['to_station_id'].apply(lambda x: match_chicago_area_by_station_id(divvy_stations, x))
     divvy_2020.to_csv('cleaned_data/divvy_2020_trips.csv')
 
+    # print completed time
+    print(assemble_trips_data.__name__, " completed in ", time.time() - start_time)
+
 def match_chicago_area_by_station_id(station_df, station_id):
+    start_time = time.time()
+
     community_area = station_df[station_df['id']==station_id]['community_area']
     community_name = station_df[station_df['id']==station_id]['Name[8]'] 
     chicago_area = station_df[station_df['id']==station_id]['chicago_area']
 
+    # print completed time
+    print(match_chicago_area_by_station_id.__name__, " completed in ", time.time() - start_time)
+
     return community_area, community_name, chicago_area
 
 def chicago_area_lookup(df, area_name):
+    start_time = time.time()
+
     # find index value where community name is in list of areas
     for index, row in df.iterrows():
         if area_name in df['vteCommunity areas in Chicago.1'][index]:
             return df['vteCommunity areas in Chicago'][index]
         else:
             pass
+
+    # print completed time
+    print(chicago_area_lookup.__name__, " completed in ", time.time() - start_time)
