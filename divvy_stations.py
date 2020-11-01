@@ -1,7 +1,11 @@
 import requests
+import time
 import pandas as pd
 
-def get_divvy_station_data():   
+def get_divvy_station_data():
+    # start time for time keeping
+    start_time = time.time()
+
     # request divvy station data
     url = "https://data.cityofchicago.org/resource/bbyy-e7gq.json"
     r = requests.get(url)
@@ -14,5 +18,8 @@ def get_divvy_station_data():
 
     # Drop stations outside of the city as there is no community area number
     divvy_stations = divvy_stations[~divvy_stations['community_area'].isna()]
+
+    # print completed time
+    print(get_divvy_station_data.__name__, " completed in ", time.time() - start_time)
 
     return divvy_stations

@@ -5,6 +5,7 @@ from divvy_stations import get_divvy_station_data
 
 # import modules
 import pandas as pd 
+import numpy as np
 import time
 
 def assemble_trips_data():
@@ -26,16 +27,37 @@ def assemble_trips_data():
     divvy_stations = pd.merge(divvy_stations, community_area, how='left', left_on='community_area', right_on=['Number[8]'])
     divvy_stations['chicago_area'] = divvy_stations['Name[8]'].apply(lambda x: chicago_area_lookup(chicago_area, x))
 
+    # Remove divvy trips from stations outside of Chicago
+    divvy_stations_chi = divvy_stations['id'].to_list()
+
+    divvy_2019 = divvy_2019[(divvy_2019['from_station_id'].isin(divvy_stations_chi)) & (divvy_2019['to_station_id'].isin(divvy_stations_chi))]
+    divvy_2020 = divvy_2020[(divvy_2020['start_station_id'].isin(divvy_stations_chi)) & (divvy_2020['end_station_id'].isin(divvy_stations_chi))]
+
     # Bring in community area / chicago area data from divvy_stations table
     # 2019 data
-    divvy_2019[['from_community_area', 'from_community_name', 'from_chicago_area']] = divvy_2019['from_station_id'].apply(lambda x: match_chicago_area_by_station_id(divvy_stations, x))
-    divvy_2019[['to_community_area', 'to_community_name', 'to_chicago_area']] = divvy_2019['to_station_id'].apply(lambda x: match_chicago_area_by_station_id(divvy_stations, x))
-    divvy_2019.to_csv('cleaned_data/divvy_2019_trips.csv')
+    
+    divvy_2019['from_community_area'] = [divvy_stations.loc[divvy_stations['id'] == x]['community_area'].to_numpy()[0] for x in divvy_2019['from_station_id']]
+    divvy_2019['from_community_name'] = [divvy_stations.loc[divvy_stations['id'] == x]['Name[8]'].to_numpy()[0] for x in divvy_2019['from_station_id']]
+    divvy_2019['from_chicago_area'] = [divvy_stations.loc[divvy_stations['id'] == x]['chicago_area'].to_numpy()[0] for x in divvy_2019['from_station_id']]
+
+    divvy_2019['to_community_area'] = [divvy_stations.loc[divvy_stations['id'] == x]['community_area'].to_numpy()[0] for x in divvy_2019['to_station_id']]
+    divvy_2019['to_community_name'] = [divvy_stations.loc[divvy_stations['id'] == x]['Name[8]'].to_numpy()[0] for x in divvy_2019['to_station_id']]
+    divvy_2019['to_chicago_area'] = [divvy_stations.loc[divvy_stations['id'] == x]['chicago_area'].to_numpy()[0] for x in divvy_2019['to_station_id']]
+
+    divvy_2019.to_csv('cleaned_data/divvy_2019_trips.csv', chunksize=100000)
+    print("2019 done!")
 
     # 2020 data
-    divvy_2020[['from_community_area', 'from_community_name', 'from_chicago_area']] = divvy_2020['from_station_id'].apply(lambda x: match_chicago_area_by_station_id(divvy_stations, x))
-    divvy_2020[['to_community_area', 'to_community_name', 'to_chicago_area']] = divvy_2020['to_station_id'].apply(lambda x: match_chicago_area_by_station_id(divvy_stations, x))
-    divvy_2020.to_csv('cleaned_data/divvy_2020_trips.csv')
+    divvy_2020['from_community_area'] = [divvy_stations.loc[divvy_stations['id'] == x]['community_area'].to_numpy()[0] for x in divvy_2020['start_station_id']]
+    divvy_2020['from_community_name'] = [divvy_stations.loc[divvy_stations['id'] == x]['Name[8]'].to_numpy()[0] for x in divvy_2020['start_station_id']]
+    divvy_2020['from_chicago_area'] = [divvy_stations.loc[divvy_stations['id'] == x]['chicago_area'].to_numpy()[0] for x in divvy_2020['start_station_id']]
+
+    divvy_2020['to_community_area'] = [divvy_stations.loc[divvy_stations['id'] == x]['community_area'].to_numpy()[0] for x in divvy_2020['end_station_id']]
+    divvy_2020['to_community_name'] = [divvy_stations.loc[divvy_stations['id'] == x]['Name[8]'].to_numpy()[0] for x in divvy_2020['end_station_id']]
+    divvy_2020['to_chicago_area'] = [divvy_stations.loc[divvy_stations['id'] == x]['chicago_area'].to_numpy()[0] for x in divvy_2020['end_station_id']]
+
+    divvy_2020.to_csv('cleaned_data/divvy_2020_trips.csv', chunksize=100000)
+    print("2020 done!")
 
     # print completed time
     print(assemble_trips_data.__name__, " completed in ", time.time() - start_time)
@@ -48,7 +70,7 @@ def match_chicago_area_by_station_id(station_df, station_id):
     chicago_area = station_df[station_df['id']==station_id]['chicago_area']
 
     # print completed time
-    print(match_chicago_area_by_station_id.__name__, " completed in ", time.time() - start_time)
+    print(match_chicago_area_by_station_id.__name__, " completed in ", round(time.time() - start_time, 2))
 
     return community_area, community_name, chicago_area
 
