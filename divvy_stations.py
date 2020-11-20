@@ -42,4 +42,4 @@ def grab_community_area_shapefiles():
 
 def find_polygon(gdf, coordinate):
     dex = gdf[gdf['geometry'].contains(coordinate)].index.values[0]
-    return gdf['area_num_1'][dex]
+    return int(gdf['area_num_1'][dex])
